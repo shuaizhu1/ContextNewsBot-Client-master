@@ -7,51 +7,53 @@ $(function() {
     const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
     var twitterIntervalID = null;
-    setAddCNBButtonInterval();
 
     var cnbOpenTweetID = null;
+    console.log(location.host)
+    if (location.host == "twitter.com") {
+      var clickLogic = function(e) {
+        e = e || window.event;
+        var target = e.target || e.srcElement,
+        text = target.textContent || target.innerText;
+        test1 = target.parentElement.parentNode.parentNode.children[1]
+        console.log(target.parentElement.parentNode.children[1].children[1].innerText)
+        console.log(text);
 
-    function addCNBToTweets() {
-      let $tweets = $(TWEET_CONTAINER).not('.cnb-btn-inserted');
-      $tweets.each(function(index) {
-        let $this = $(this);
-        let $footer = $this.find(TWEET_FOOTER);
-        // $footer.prepend(createButton($this.attr('data-item-id')));
-        $this.addClass('cnb-btn-inserted');
-      });
-    }
+        let str = '<div class="ProfileTweet-action ProfileTweet-action--CNB js-toggleState">' +
+          '<button class="ProfileTweet-actionButton js-actionButton" type="button">' +
+          '<div class="IconContainer js-tooltip" data-original-title="Give me more context!">' +
+          '<span class="Icon Icon--CNB"></span>' +
+          '<span class="u-hiddenVisually">Context News Bot</span>' +
+          '</div><span class="ProfileTweet-actionCount">' +
+          '<span class="ProfileTweet-actionCountForPresentation" aria-hidden="true">CNB</span>' +
+          '</span></button></div>';
 
-    var logic1 = function(e) {
-      e = e || window.event;
-      var target = e.target || e.srcElement,
-      text = target.textContent || target.innerText;
-      test1 = target.parentElement.parentNode.parentNode.children[1]
-      console.log(target.parentElement.parentNode.children[1].children[1].innerText)
-      console.log(text);
-      console.log(target)
-      let str = '<div class="ProfileTweet-action ProfileTweet-action--CNB js-toggleState">' +
-        '<button class="ProfileTweet-actionButton js-actionButton" type="button">' +
-        '<div class="IconContainer js-tooltip" data-original-title="Give me more context!">' +
-        '<span class="Icon Icon--CNB"></span>' +
-        '<span class="u-hiddenVisually">Context News Bot</span>' +
-        '</div>' +
-        '<span class="ProfileTweet-actionCount">' +
-        '<span class="ProfileTweet-actionCountForPresentation" aria-hidden="true">CNB</span>' +
-        '</span>' +
-        '</button>' +
-        '</div>';
-
-      console.log($(str)[0]);
-      target.prepend($(str)[0]);
-    }
-    document.addEventListener('click', logic1, false);
-
-    function setAddCNBButtonInterval() {
-      addCNBToTweets();
-      if (twitterIntervalID == null) {
-        twitterIntervalID = setInterval(addCNBToTweets, 2000);
+        target.prepend($(str)[0]);
       }
+    } else {
+      var clickLogic = function(e) {
+        e = e || window.event;
+        var target = e.target || e.srcElement,
+        text = target.textContent || target.innerText;
+        test1 = target.parentElement.parentNode.parentNode.children[1]
+        test1 = target.parentElement.parentNode.parentNode.children[1]
+        console.log(test1.children[1].children[0].innerText)
+        console.log(text)
+        let str = '<div class="ProfileTweet-action ProfileTweet-action--CNB js-toggleState">' +
+          '<button class="ProfileTweet-actionButton js-actionButton" type="button">' +
+          '<div class="IconContainer js-tooltip" data-original-title="Give me more context!">' +
+          '<span class="Icon Icon--CNB"></span>' +
+          '<span class="u-hiddenVisually">Context News Bot</span>' +
+          '</div><span class="ProfileTweet-actionCount">' +
+          '<span class="ProfileTweet-actionCountForPresentation" aria-hidden="true">CNB</span>' +
+          '</span></button></div>';
+
+        target.prepend($(str)[0]);
+      }
+      document.addEventListener('click', clickLogic, false);
     }
+
+    document.addEventListener('click', clickLogic, false);
 
     function createContextPanel(tweetID) {
       let $tweet = $('div.tweet[data-tweet-id="' + tweetID + '"]');
@@ -120,6 +122,7 @@ $(function() {
       return $.ajax(settings);
     }
 
+    // used to toggle context menu
     function buttonListener() {
       let $this = $(this);
       let btnTweetID = $this.attr('data-tweet-id');
