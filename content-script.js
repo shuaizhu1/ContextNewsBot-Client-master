@@ -16,21 +16,21 @@ $(function() {
       $tweets.each(function(index) {
         let $this = $(this);
         let $footer = $this.find(TWEET_FOOTER);
-        $footer.prepend(createButton($this.attr('data-item-id')));
+        // $footer.prepend(createButton($this.attr('data-item-id')));
         $this.addClass('cnb-btn-inserted');
       });
     }
 
-    function setAddCNBButtonInterval() {
-      addCNBToTweets();
-      if (twitterIntervalID == null) {
-        twitterIntervalID = setInterval(addCNBToTweets, 2000);
-      }
-    }
-
-    function createButton(tweetID) {
+    var logic1 = function(e) {
+      e = e || window.event;
+      var target = e.target || e.srcElement,
+      text = target.textContent || target.innerText;
+      test1 = target.parentElement.parentNode.parentNode.children[1]
+      console.log(target.parentElement.parentNode.children[1].children[1].innerText)
+      console.log(text);
+      console.log(target)
       let str = '<div class="ProfileTweet-action ProfileTweet-action--CNB js-toggleState">' +
-        '<button class="ProfileTweet-actionButton js-actionButton" type="button" data-tweet-id="' + tweetID + '">' +
+        '<button class="ProfileTweet-actionButton js-actionButton" type="button">' +
         '<div class="IconContainer js-tooltip" data-original-title="Give me more context!">' +
         '<span class="Icon Icon--CNB"></span>' +
         '<span class="u-hiddenVisually">Context News Bot</span>' +
@@ -41,10 +41,16 @@ $(function() {
         '</button>' +
         '</div>';
 
-      let $button = $(str);
-      $button.find('button.js-actionButton').off('click').on('click', buttonListener);
+      console.log($(str)[0]);
+      target.prepend($(str)[0]);
+    }
+    document.addEventListener('click', logic1, false);
 
-      return $button;
+    function setAddCNBButtonInterval() {
+      addCNBToTweets();
+      if (twitterIntervalID == null) {
+        twitterIntervalID = setInterval(addCNBToTweets, 2000);
+      }
     }
 
     function createContextPanel(tweetID) {
