@@ -3,17 +3,17 @@
     "description": "This application scrapes online text media to provide more context and two reliability scores to allow users to see a broader and more realistic perspective.",
     "version": "1.1",
     "manifest_version": 2,
-    "permissions": ["*://*.twitter.com/*", "https://www.facebook.com/*", "https://developer.chrome.com/*"],
+    "permissions": ["*://*.twitter.com/*", "https://www.facebook.com/*", "https://reddit.com/*"],
     "content_scripts": [{
-        "matches": ["*://*.twitter.com/*"],
+        "matches": ["*://*.twitter.com/*", "https://www.facebook.com/*", "https://reddit.com/*"],
         "css": ["stylesheet.css"],
         "js": ["jquery.min.js", "content-script.js"]
     }],
-    "web_accessible_resources": ["newspaper.svg"],
+    "web_accessible_resources": ["coronatruthfinder.png"],
     "icons": {
-        "128": "newspaper.png"
+        "128": "coronatruthfinder.png"
     },
     "browser_action": {
-        "default_icon": "newspaper.png"
+        "default_icon": "coronatruthfinder.png"
     }
 }
