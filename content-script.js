@@ -1,141 +1,104 @@
 $(function() {
-    const TWEET_CONTAINER = 'div.stream ol#stream-items-id li.stream-item[data-item-type="tweet"] div.tweet';
-    const TWEET_FOOTER = '.content .stream-item-footer .ProfileTweet-actionList';
-    const API_BASE_URL = 'http://127.0.0.1:5000';
-
     const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-    var twitterIntervalID = null;
-
-    var cnbOpenTweetID = null;
     console.log(location.host)
     if (location.host == "twitter.com") {
       var clickLogic = function(e) {
         e = e || window.event;
         var target = e.target || e.srcElement,
         text = target.textContent || target.innerText;
-        test1 = target.parentElement.parentNode.parentNode.children[1]
+
         console.log(target.parentElement.parentNode.children[1].children[1].innerText)
         console.log(text);
+        var titleObj = target.parentElement.parentNode.children[1].children[1].innerText.split(/\r?\n/);
+        var obj = {
+          entity: titleObj[0],
+          entityTag: titleObj[1],
+          body: text,
+          type: "twitter"
+        }
+        console.log(JSON.stringify(obj))
+        $.post("https://webhook.site/3fae51a7-3652-4ddc-b348-3d3fada05c0d",
+        obj,
+        function(data, status){
+          console.log("Data: " + data + "\nStatus: " + status);
+          data = {
+            "articles": [
+              {
+                "author": "Bob Brigham",
+                "content": "The Associated Press issued a bombshell report on Saturday evening that the White House overruled medical experts who had sought to issue a warning to America's seniors.\r\n\"The White House overruled health officials who wanted to recommend that elderly and phy\u2026 [+1536 chars]",
+                "description": "White House reportedly overruled health officials who had urgent coronavirus warning for America\u2019s seniors",
+                "publishedAt": "2020-03-08T09:00:01Z",
+                "source": {
+                  "id": null,
+                  "name": "Salon.com"
+                },
+                "title": "Trump administration blocked health officials' urgent coronavirus warning: report",
+                "url": "https://www.salon.com/2020/03/08/trump-administration-blocked-health-officials-urgent-coronavirus-warning-report_partner/",
+                "urlToImage": "https://media.salon.com/2020/01/donald-trump-0131201.jpg"
+              },
+              {
+                "author": "Bob Brigham",
+                "content": "The Associated Press issued a bombshell report on Saturday evening that the White House overruled medical experts who had sought to issue a warning to America\u2019s seniors.\r\n\u201cThe White House overruled health officials who wanted to recommend that elderly and phy\u2026 [+1247 chars]",
+                "description": "The Associated Press issued a bombshell report on Saturday evening that the White House overruled medical experts who had sought to issue a warning to America\u2019s seniors. \u201cThe White House overruled health officials who wanted to recommend that elderly and phys\u2026",
+                "publishedAt": "2020-03-08T03:05:23Z",
+                "source": {
+                  "id": null,
+                  "name": "Rawstory.com"
+                },
+                "title": "White House overruled health officials who had urgent coronavirus warning for America\u2019s seniors: report",
+                "url": "https://www.rawstory.com/2020/03/white-house-overruled-health-officials-who-had-urgent-coronavirus-warning-for-americas-seniors-report/",
+                "urlToImage": "https://www.rawstory.com/wp-content/uploads/2019/10/trump-afp-6.jpg"
+              }
+            ],
+            "status": "ok",
+            "totalResults": 12
+          };
 
-        let str = '<div class="ProfileTweet-action ProfileTweet-action--CNB js-toggleState">' +
-          '<button class="ProfileTweet-actionButton js-actionButton" type="button">' +
-          '<div class="IconContainer js-tooltip" data-original-title="Give me more context!">' +
-          '<span class="Icon Icon--CNB"></span>' +
-          '<span class="u-hiddenVisually">Context News Bot</span>' +
-          '</div><span class="ProfileTweet-actionCount">' +
-          '<span class="ProfileTweet-actionCountForPresentation" aria-hidden="true">CNB</span>' +
-          '</span></button></div>';
+          let str = '<div class="news-card-container">';
+          for (const [i, datum] of data['articles'].entries()) {
+            let datePublished = new Date(datum['publishedAt']);
+            str += '<div class="card news-card card-' + i + '">';
+            str += '<div class="card-section">';
+            str += '<article class="news-card-article">';
+            str += '<em class="news-card-date">' + DAYS[datePublished.getDay()] + ', ' + datePublished.getDate() + ' ' + MONTHS[datePublished.getMonth()] + '</em>';
+            str += '<h3 class="news-card-title">' + datum['title'] + '</h3>';
+            str += '<p class="news-card-description">' + datum['description'] + '</p>';
+            str += '<p><a href="' + datum['url'] + '">Continue reading on ' + datum['source']['name'] + ' </a></p>';
 
-        target.prepend($(str)[0]);
+            let colorClass = 'orange';
+            if (datum['sentiment_score'] > 0)
+                colorClass = 'green'
+            else if (datum['sentiment_score'] < 0)
+                colorClass = 'red'
+            str += '<div class="sentiment-circle ' + colorClass + '"></div>';
+
+            str += '</article>' + '</div>' + '</div>';
+          }
+
+          str += '</div>';
+          console.log($(str)[0])
+          target.append($(str)[0]);
+        });
       }
     } else {
       var clickLogic = function(e) {
         e = e || window.event;
         var target = e.target || e.srcElement,
         text = target.textContent || target.innerText;
-        test1 = target.parentElement.parentNode.parentNode.children[1]
-        test1 = target.parentElement.parentNode.parentNode.children[1]
-        console.log(test1.children[1].children[0].innerText)
         console.log(text)
-        let str = '<div class="ProfileTweet-action ProfileTweet-action--CNB js-toggleState">' +
-          '<button class="ProfileTweet-actionButton js-actionButton" type="button">' +
-          '<div class="IconContainer js-tooltip" data-original-title="Give me more context!">' +
-          '<span class="Icon Icon--CNB"></span>' +
-          '<span class="u-hiddenVisually">Context News Bot</span>' +
-          '</div><span class="ProfileTweet-actionCount">' +
-          '<span class="ProfileTweet-actionCountForPresentation" aria-hidden="true">CNB</span>' +
-          '</span></button></div>';
-
-        target.prepend($(str)[0]);
+        var titleObj = target.parentElement.parentNode.parentNode.children[1].children[1].children[0].innerText.split(/\r?\n/);
+        var obj = {
+          entity: titleObj[0],
+          entityTime: titleObj[1],
+          body: text,
+          type: "facebook"
+        }
+        console.log(JSON.stringify(obj))
       }
       document.addEventListener('click', clickLogic, false);
     }
 
     document.addEventListener('click', clickLogic, false);
-
-    function createContextPanel(tweetID) {
-      let $tweet = $('div.tweet[data-tweet-id="' + tweetID + '"]');
-
-      $tweet.find('.cnb-loading-text').remove();
-      let $loadingElement = $('<h4 class="cnb-loading-text">Loading...</h4>');
-      $tweet.append($loadingElement);
-
-      getDataForTweet(tweetID).then((data) => {
-        console.log(data);
-
-        if (data['relevant_articles'].length == 0 && data['wiki_urls'].length == 0) {
-          $tweet.find('.cnb-loading-text').text('No relevant articles found!');
-          return;
-        }
-
-        let str = '<div class="news-card-container">';
-        for (const [i, datum] of data['relevant_articles'].entries()) {
-          let datePublished = new Date(datum['publishedAt']);
-          str += '<div class="card news-card card-' + i + '">';
-          str += '<div class="card-section">';
-          str += '<article class="news-card-article">';
-          str += '<em class="news-card-date">' + DAYS[datePublished.getDay()] + ', ' + datePublished.getDate() + ' ' + MONTHS[datePublished.getMonth()] + '</em>';
-          str += '<h3 class="news-card-title">' + datum['title'] + '</h3>';
-          str += '<p class="news-card-description">' + datum['description'] + '</p>';
-          str += '<p><a href="' + datum['url'] + '">Continue reading on ' + datum['source']['name'] + ' </a></p>';
-
-          let colorClass = 'orange';
-          if (datum['sentiment_score'] > 0)
-              colorClass = 'green'
-          else if (datum['sentiment_score'] < 0)
-              colorClass = 'red'
-          str += '<div class="sentiment-circle ' + colorClass + '"></div>';
-
-          str += '</article>' + '</div>' + '</div>';
-        }
-
-        for (const [i, wiki] of data['wiki_urls'].entries()) {
-            str += '<div class="wikipedia-tag">';
-            str += '<div class="keyword keyword-' + i + '">';
-            str += '<a href="' + wiki['wiki_url'] + '">' + wiki['entity_name'] + ' [Wikipedia]</a>';
-            str += '</div>' + '</div>';
-        }
-        str += '</div>';
-
-        let $contextPanel = $(str);
-        $tweet.append($contextPanel);
-        $tweet.find('.cnb-loading-text').remove();
-        cnbOpenTweetID = tweetID;
-      });
-    }
-
-    function getDataForTweet(tweetID) {
-      var settings = {
-        "async": true,
-        "crossDomain": true,
-        "url": API_BASE_URL + "/tweet",
-        "method": "POST",
-        "headers": {
-            "content-type": "application/json",
-            "cache-control": "no-cache",
-        },
-        "processData": false,
-        "data": "{\n\t\"id\": " + tweetID + "\n}"
-      }
-      return $.ajax(settings);
-    }
-
-    // used to toggle context menu
-    function buttonListener() {
-      let $this = $(this);
-      let btnTweetID = $this.attr('data-tweet-id');
-
-      if (cnbOpenTweetID == null) {
-        createContextPanel(btnTweetID);
-      } else {
-        $('div.tweet[data-tweet-id="' + cnbOpenTweetID + '"]').find('.news-card-container').remove();
-        if (btnTweetID != cnbOpenTweetID) {
-            createContextPanel(btnTweetID);
-        } else {
-            cnbOpenTweetID = null;
-        }
-      }
-    }
 });
