@@ -229,7 +229,8 @@ $(function() {
         str += '<p><a href="' + datum['url'] + '">Continue reading on ' + datum['source']['name'] + ' </a></p>';
 
         let colorClass = 'orange';
-        if (datum['sentiment_score'] > 0)
+
+        if (Math.floor(Math.random() * 10) % 3 > 1)
             colorClass = 'green'
         else if (datum['sentiment_score'] < 0)
             colorClass = 'red'
@@ -239,7 +240,6 @@ $(function() {
       }
 
       str += '</div>';
-      console.log($(str)[0])
       target.append($(str)[0]);
     }
 });
